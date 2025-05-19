@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple SAM template with Node.js environment
+
+Parameters:
+  MongoUri:
+    Type: String
+    Description: MongoDB connection string
+  jwtSecretKey:
+    Type: String
+    Description: JWT secret key  
+  ItemBucketName:
+    Type: String
+    Description: S3 bucket name for item images 
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    Environment:
+      Variables:
+        MONGO_URI: !Ref MongoUri
+        JWT_SECRET_KEY: !Ref jwtSecretKey
+
+        
+Resources:
+  CombineLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: CombineLibLayer
+      Description: CombineLib layer for Node.js
+      ContentUri: ./layers/combineLib
+      CompatibleRuntimes:
+        - nodejs20.x
+
+  ProductImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ItemBucketName
+  RegisterShop:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: RegisterShop.handler
+      CodeUri: ./src/handlers/RegisterShops
+      Layers:
+        - !Ref CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /addShop
+            Method: post
+  AddItem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: addItem.handler
+      CodeUri: ./src/handlers/addItem  
+      Layers:
+        - !Ref CombineLibLayer    
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:      
+            Path: /addItem
+            Method: post
+      Policies: 
+        - S3WritePolicy:
+            BucketName: !Ref ProductImageBucket
+      Environment:
+        Variables:
+          Bucket_Name : !Ref ItemBucketName            # !Ref ProductimageBicket returns logical name of the bucket 
+            
+
+  loginStore:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: loginStore.handler
+      CodeUri: ./src/handlers/loginStore
+      Layers:
+        - !Ref CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /loginStore
+            Method: post    
+
+  getAllItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getAllItems.handler
+      CodeUri: ./src/handlers/getAllItems
+      Layers:
+        - !Ref CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /getAllItems
+            Method: get
+
+  deleteitem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deleteitem.handler
+      CodeUri: ./src/handlers/deleteItem
+      Layers:
+        - !Ref CombineLibLayer          
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /deleteItem 
+            Method: post
+  
+  getItemById:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getItemById.handler
+      CodeUri: ./src/handlers/getItemById
+      Layers:
+        - !Ref CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{itemId}/getItemById
+            Method: get

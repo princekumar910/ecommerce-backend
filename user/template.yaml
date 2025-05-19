@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'User service template for ecommerce backend'
+
+Parameters:
+
+  MongoUri:
+    Type: String
+    Description: mongo connection String  
+  jwtSecretKey:
+      Type: String
+      Description: JWT secret key 
+   
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    Runtime: nodejs22.x
+    Handler: index.handler
+    Environment:
+      MONGO_URI: !Ref MongoUri
+      JWT_SECRET_KEY: !Ref jwtSecretKey
+
+Resources:
+
+  # adding the layer
+  combinedlayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: user-service-layer
+      ContentUri: ./src/layers/combineLib
+
+  # Resources will be defined here
+  # ----------------------------------------------------------------------user registration function----------------------------------------------------------
+  userRegistrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/handler/userRegistration
+      Events:
+        UserRegistration:
+          Type: Api
+          Properties:
+            Path: /user/register
+            Method: post
+  # -------------------------------------------------------------------------add item to cart function------------------------------------------------------------------
+  AddItemToCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/handler/    
+      Events:
+        AddItemToCart:
+          Type: Api
+          Properties:
+            Path: /user/addToCart
+            Method: post
+  # -------------------------------------------------------------------------get user cart function------------------------------------------------------------------
+  GetUserCartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src/handler/
+      Events:
+        GetUserCart:
+          Type: Api
+          Properties:
+            Path: /user/getCart
+            Method: get
+
+ 
+Outputs:
+  getUserCartFunction:
+    Description: Name of the getUserCartFunction
+    Value: !Ref GetUserCartFunction
+  AddItemToCart:
+    Description: Name of the User AddItemToCart function
+    Value: !Ref AddItemToCartFunction  
+  userRegistrationFunction:
+    Description: Name of the User Registration function
+    Value: !Ref userRegistrationFunction
