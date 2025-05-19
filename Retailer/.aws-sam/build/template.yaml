@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple SAM template with Node.js environment
+Parameters:
+  MongoUri:
+    Type: String
+    Description: MongoDB connection string
+  jwtSecretKey:
+    Type: String
+    Description: JWT secret key
+  ItemBucketName:
+    Type: String
+    Description: S3 bucket name for item images
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    Environment:
+      Variables:
+        MONGO_URI:
+          Ref: MongoUri
+        JWT_SECRET_KEY:
+          Ref: jwtSecretKey
+Resources:
+  CombineLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: CombineLibLayer
+      Description: CombineLib layer for Node.js
+      ContentUri: ..\..\layers\combineLib
+      CompatibleRuntimes:
+      - nodejs20.x
+  ProductImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: ItemBucketName
+  RegisterShop:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: RegisterShop.handler
+      CodeUri: RegisterShop
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /addShop
+            Method: post
+    Metadata:
+      SamResourceId: RegisterShop
+  AddItem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: addItem.handler
+      CodeUri: AddItem
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /addItem
+            Method: post
+      Policies:
+      - S3WritePolicy:
+          BucketName:
+            Ref: ProductImageBucket
+      Environment:
+        Variables:
+          Bucket_Name:
+            Ref: ItemBucketName
+    Metadata:
+      SamResourceId: AddItem
+  loginStore:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: loginStore.handler
+      CodeUri: loginStore
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /loginStore
+            Method: post
+    Metadata:
+      SamResourceId: loginStore
+  getAllItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getAllItems.handler
+      CodeUri: getAllItems
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /getAllItems
+            Method: get
+    Metadata:
+      SamResourceId: getAllItems
+  deleteitem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deleteitem.handler
+      CodeUri: deleteitem
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /deleteItem
+            Method: post
+    Metadata:
+      SamResourceId: deleteitem
+  getItemById:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getItemById.handler
+      CodeUri: getItemById
+      Layers:
+      - Ref: CombineLibLayer
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{itemId}/getItemById
+            Method: get
+    Metadata:
+      SamResourceId: getItemById
