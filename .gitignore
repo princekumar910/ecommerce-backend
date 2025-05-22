@@ -127,8 +127,8 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
-.Retailer/aws-sam/
-.user/aws-sam/
+.Retailer/.aws-sam/
+.user/.aws-sam/
 .Retailer/prod.sam-params
 .user/prod.sam-params
 # yarn v2
