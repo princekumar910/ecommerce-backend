@@ -1,15 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'User service template for ecommerce backend'
-
+Description: User service template for ecommerce backend
 Parameters:
-
   MongoUri:
     Type: String
-    Description: mongo connection String  
+    Description: mongo connection String
   jwtSecretKey:
-      Type: String
-      Description: JWT secret key 
-   
+    Type: String
+    Description: JWT secret key
 Globals:
   Function:
     Timeout: 30
@@ -17,69 +14,70 @@ Globals:
     Runtime: nodejs22.x
     Handler: index.handler
     Environment:
-      MONGO_URI: !Ref MongoUri
-      JWT_SECRET_KEY: !Ref jwtSecretKey
-
+      MONGO_URI:
+        Ref: MongoUri
+      JWT_SECRET_KEY:
+        Ref: jwtSecretKey
 Resources:
-
-  # adding the layer
   userLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: user-service-layer
-      ContentUri: ./layers/combineLib
+      ContentUri: ..\..\layers\combineLib
       CompatibleRuntimes:
-        - nodejs22.x
-     
-  # Resources will be defined here
-  # ----------------------------------------------------------------------user registration function----------------------------------------------------------
+      - nodejs22.x
   userRegistrationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src/handlers/userRegistration
+      CodeUri: userRegistrationFunction
       Layers:
-      - !Ref userLayer
+      - Ref: userLayer
       Events:
         UserRegistration:
           Type: Api
           Properties:
             Path: /user/register
             Method: post
-  # -------------------------------------------------------------------------add item to cart function------------------------------------------------------------------
+    Metadata:
+      SamResourceId: userRegistrationFunction
   AddItemToCartFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src/handlers/addItemToCart 
+      CodeUri: AddItemToCartFunction
       Layers:
-      - !Ref userLayer   
+      - Ref: userLayer
       Events:
         AddItemToCart:
           Type: Api
           Properties:
             Path: /user/addToCart
             Method: post
-  # -------------------------------------------------------------------------get user cart function------------------------------------------------------------------
+    Metadata:
+      SamResourceId: AddItemToCartFunction
   GetUserCartFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src/handler/getUserCart
+      CodeUri: GetUserCartFunction
       Layers:
-      - !Ref userLayer
+      - Ref: userLayer
       Events:
         GetUserCart:
           Type: Api
           Properties:
             Path: /user/getCart
             Method: get
-
- 
+    Metadata:
+      SamResourceId: GetUserCartFunction
 Outputs:
   getUserCartFunction:
     Description: Name of the getUserCartFunction
-    Value: !Ref GetUserCartFunction
+    Value:
+      Ref: GetUserCartFunction
   AddItemToCart:
     Description: Name of the User AddItemToCart function
-    Value: !Ref AddItemToCartFunction  
+    Value:
+      Ref: AddItemToCartFunction
   userRegistrationFunction:
     Description: Name of the User Registration function
-    Value: !Ref userRegistrationFunction
+    Value:
+      Ref: userRegistrationFunction

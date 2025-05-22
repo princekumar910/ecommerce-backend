@@ -6,10 +6,7 @@ const findItemById = require('/opt/nodejs/utils/findItemById.js');
 const uploadImageToS3 = require('/opt/nodejs/utils/uploadImageToS3.js')
 async function addItem(event, context) {
     try {
-        console.log("before connection item" ,  Item.create({}))
-      let connection =   await mongoConnect();
-    //   console.log("after connection item" , Item.create({}))
-    //   console.log("connection------>" , connection)
+        await mongoConnect();
         const { name , price , description , AvailableQuantity, images , itemId } = JSON.parse(event.body);
         const newItem = {
             name,
@@ -56,7 +53,12 @@ async function addItem(event, context) {
                 body: JSON.stringify({ message: "Item Added successfully", result })
             };
         }
-        
+        else if(itemStatus && AvailableQuantity < 0){
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Available Quantity should be greater than 0" })
+            }
+        }
         else{
             const result = await Item.findOneAndUpdate({ itemId: itemId + " " + decode.email }, {
                 $set : {

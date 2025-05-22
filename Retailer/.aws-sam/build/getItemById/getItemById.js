@@ -4,7 +4,7 @@ const Item = require('/opt/nodejs/models/ItemSchema.js');
 async function getItemById(event, context) {
     try {
         await mongoConnect();
-        const { itemId } = event.pathParameters ;
+        const { itemId } = JSON.parse(event.body);
         if (!itemId) {
             return {
                 statusCode: 400,
@@ -18,8 +18,10 @@ async function getItemById(event, context) {
                 body: JSON.stringify({ message: "Unauthorized" })
             }
         }
-        const result = await Item.find({itemId : itemId })
-        console.log("==" , result )
+        const token = verifyToken.split(" ")[1];
+        const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        
+        const result = await Item.find({itemId : itemId + " " + decode.email})
         if(!result){
             return {
                 statusCode: 404,
