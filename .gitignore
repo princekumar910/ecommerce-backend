@@ -1,3 +1,9 @@
+# sam build files
+*.aws-sam/
+.aws-sam/**
+samconfig.toml
+
+
 # Logs
 logs
 *.log
