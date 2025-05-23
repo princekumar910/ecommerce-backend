@@ -1,1 +1,3 @@
-
+ParameterKey=MongoUri,ParameterValue=mongodb+srv://princekumar007p:PRINCEkumar910@cluster0.un8m3gh.mongodb.net/E-commerce-Backend
+ParameterKey=jwtSecretKey,ParameterValue=1234567890
+ParameterKey=ItemBucketName,ParameterValue=ecommerce-princekumar007p-images

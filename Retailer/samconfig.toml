@@ -1,10 +1,11 @@
 version = 0.1
 [default.deploy.parameters]
-stack_name = "Ecommerce-backend"
+stack_name = "Retailer-ecommerce-backend"
 resolve_s3 = true
-s3_prefix = "Ecommerce-backend"
-region = "eu-north-1"
-capabilities = "CAPABILITY_IAM"
-parameter_overrides = "MongoUri=\"mongodb+srv://princekumar007p:PRINCEkumar910@cluster0.un8m3gh.mongodb.net/E-commerce-Backend\" jwtSecretKey=\"1234567890\""
-image_repositories = []
+s3_prefix = "Retailer-ecommerce-backend"
+region = "ap-south-1"
 confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "MongoUri=\"mongodb+srv://princekumar007p:PRINCEkumar910@cluster0.un8m3gh.mongodb.net/E-commerce-Backend\" jwtSecretKey=\"1234567890\" ItemBucketName=\"ecommerce-princekumar007p-images\""
+image_repositories = []

@@ -14,10 +14,11 @@ Globals:
     Runtime: nodejs22.x
     Handler: index.handler
     Environment:
-      MONGO_URI:
-        Ref: MongoUri
-      JWT_SECRET_KEY:
-        Ref: jwtSecretKey
+      Variables:
+        MONGO_URI:
+          Ref: MongoUri
+        JWT_SECRET_KEY:
+          Ref: jwtSecretKey
 Resources:
   userLayer:
     Type: AWS::Serverless::LayerVersion

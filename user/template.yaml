@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'User service template for ecommerce backend'
 
 Parameters:
-
   MongoUri:
     Type: String
     Description: mongo connection String  
@@ -17,8 +16,9 @@ Globals:
     Runtime: nodejs22.x
     Handler: index.handler
     Environment:
-      MONGO_URI: !Ref MongoUri
-      JWT_SECRET_KEY: !Ref jwtSecretKey
+      Variables: 
+        MONGO_URI: !Ref MongoUri
+        JWT_SECRET_KEY: !Ref jwtSecretKey
 
 Resources:
 
@@ -62,7 +62,7 @@ Resources:
   GetUserCartFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./src/handler/getUserCart
+      CodeUri: ./src/handlers/getUserCart
       Layers:
       - !Ref userLayer
       Events:

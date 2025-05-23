@@ -18,8 +18,8 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["AddItemToCartFunction"]
 
-[function_build_definitions.1025f891-a483-4d9b-9737-6731b7f39c31]
-codeuri = "C:\\Users\\princ\\Desktop\\ecommerce-backend\\user\\src\\handler\\getUserCart"
+[function_build_definitions.974c192c-d8a2-4438-99ae-e26da27f3a14]
+codeuri = "C:\\Users\\princ\\Desktop\\ecommerce-backend\\user\\src\\handlers\\getUserCart"
 runtime = "nodejs22.x"
 architecture = "x86_64"
 handler = "index.handler"
