@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User  = require('/opt/nodejs/models/user')
 const connectToDatabase = require('/opt/nodejs/utils/connectDB')
+const aws = require('aws-sdk')
+const ses = new aws.SES({ region: 'ap-south-1' });
 function validateEmail(email){
    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
    return emailRegex.test(email);
@@ -30,11 +32,29 @@ async function registerUser (event , context){
       password : hashedPassword
    }
    try {
-      
+      // send email to the user ;
+        const otp = Math.floor(100000 + Math.random() * 900000);
+            const params = {
+               Source: 'princeKumar007p@gmail.com',
+               Destination: {
+                  ToAddresses: [email],
+               },
+               Message : {
+                  Subject :{
+                     Data : 'Email Verification',
+                     Charset : 'UTF-8'
+                  },
+                  Body : {
+                     Text : {
+                        Data : `Your OTP is ${otp}`,
+                        Charset : 'UTF-8'
+                     }
+                  }
+               }
+            }
+            const sesResponse = await ses.sendEmail(params).promise();
+            console.log('Email sent:', sesResponse);
       const userCreated = await User.create(user)
-      // const newUser = new User(user);
-      // console.log("newUser===>" , newUser)
-      // const userCreated = await newUser.save();
       if(userCreated){
           const token = jwt.sign({ email : userCreated.emailId}, process.env.JWT_SECRET )
           userCreated.token = token;

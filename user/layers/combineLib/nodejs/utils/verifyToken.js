@@ -1,14 +1,16 @@
 const jwt = require('jsonwebtoken')
-async function verifyToken(token) {
-    try {
-        if(!token) {
-            return {
-                status:false,
-                statusCode: 401,
-                body: JSON.stringify({ message: "missing authentication token" })
-            }
+async function verifyToken(verifyToken) {
+    // console.log("verifyToken called with token:", token);
+    
+    if(!verifyToken) {
+        return {
+            status:false,
+            statusCode: 401,
+            body: JSON.stringify({ message: "missing authentication token" })
         }
-        const token  = token.split(" ")[1];
+    }
+    try {
+        const token  = verifyToken.split(" ")[1];
         const decoded = await jwt.verify(token , process.env.JWT_SECRET_KEY)
         return {
             status:true,
